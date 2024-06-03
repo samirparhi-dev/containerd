@@ -40,6 +40,7 @@ See our documentation on [containerd.io](https://containerd.io):
 To get started contributing to containerd, see [CONTRIBUTING](CONTRIBUTING.md).
 
 If you are interested in trying out containerd see our example at [Getting Started](docs/getting-started.md).
+--more Info below.
 
 ## Nightly builds
 
