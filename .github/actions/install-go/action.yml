@@ -1,4 +1,11 @@
 name: "Setup Go"
+on:
+  push:
+    branches:
+      - main
+      - "release/**"
+      
+name: "Go"    
 description: "Reusable action to install Go, so there is one place to bump Go versions"
 inputs:
   go-version:
