@@ -1,48 +1,37 @@
-name: "CodeQL Scan"
+name: CodeQL Analysis
 
 on:
   push:
-    branches:
-      - main
-      - "release/**"
+    branches: [main, master]
   pull_request:
-    branches:
-      - main
-      - "release/**"
-
-permissions:
-  contents: read
+    # The branches below must be a subset of the branches above
+    branches: [main, master]
+  schedule:
+    - cron: '0 0 * * 1' # weekly scan
 
 jobs:
-  CodeQL-Build:
-    permissions:
-      actions: read # for github/codeql-action/init to get workflow details
-      contents: read # for actions/checkout to fetch code
-      security-events: write # for github/codeql-action/analyze to upload SARIF results
-    strategy:
-      fail-fast: false
-
-    # CodeQL runs on ubuntu-latest, windows-latest, and macos-latest
+  analyze:
+    name: Analyze
     runs-on: ubuntu-latest
 
-    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'go', 'python', 'java' ]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - uses: ./.github/actions/install-go
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
 
-      # Initializes the CodeQL tools for scanning.
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        # Override language selection by uncommenting this and choosing your languages
-        # with:
-        #   languages: go, javascript, csharp, python, cpp, java
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
 
-      - run: |
-          sudo apt-get install -y libseccomp-dev
-          make
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: '/language:${{ matrix.language }}'
